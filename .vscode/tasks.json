@@ -1,0 +1,32 @@
+{
+    "tasks": [
+        {
+            "label": "prepare-build",
+            "type": "shell",
+            "command": "mkdir",
+            "args": ["-p", "build"],
+            "problemMatcher": []
+        },
+        {
+            "type": "cppbuild",
+            "label": "g++ build all",
+            "command": "/usr/bin/g++",
+            "args": [
+                "-std=c++14",
+                "-Wall",
+                "-g",
+                "main.cc",
+                "singleton/singleton.cc",
+                "-o",
+                "build/app",
+            ],
+            "problemMatcher": ["$gcc"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": "prepare-build",
+        }
+    ],
+    "version": "2.0.0"
+}
