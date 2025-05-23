@@ -2,6 +2,7 @@
 #include <thread>
 
 #include "singleton/singleton.h"
+#include "factorymethod/factorymethod.h"
 
 namespace {
 
@@ -37,10 +38,26 @@ void singletonTest() {
     }
 }
 
+void factoryMethodTest() {
+    std::vector<std::unique_ptr<pt::Factory>> factories;
+    factories.push_back(std::make_unique<pt::TriangleFactory>());
+    factories.push_back(std::make_unique<pt::RectangleFactory>());
+    
+    std::string res = "";
+    for (const auto& f : factories) {
+        res += f->doWork() + "; ";
+    }
+
+    if (res != "name: triangle; name: rectangle; ") {
+        throw std::runtime_error("factory method failed");
+    }
+}
+
 }
 
 int main() {
     singletonTest();
+    factoryMethodTest();
 
     std::cout << "unit tests pass" << std::endl;
 

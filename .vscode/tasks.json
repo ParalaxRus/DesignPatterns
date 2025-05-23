@@ -17,6 +17,7 @@
                 "-g",
                 "main.cc",
                 "singleton/singleton.cc",
+                "factorymethod/factorymethod.cc",
                 "-o",
                 "build/app",
             ],
