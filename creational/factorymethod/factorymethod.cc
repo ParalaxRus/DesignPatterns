@@ -1,6 +1,6 @@
 #include "factorymethod.h"
 
-namespace patterns::singleton {
+namespace patterns::creational {
 
 std::string Triangle::draw() const {
     return "triangle";

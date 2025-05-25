@@ -1,8 +1,8 @@
 #include "singleton.h"
 
-namespace patterns::singleton {
+namespace patterns::creational {
 
-std::unique_ptr<Singleton> patterns::singleton::Singleton::_singleton = nullptr;
+std::unique_ptr<Singleton> patterns::creational::Singleton::_singleton = nullptr;
 std::mutex Singleton::_mtx;
 
 Singleton* Singleton::get() {

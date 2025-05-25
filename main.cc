@@ -1,21 +1,21 @@
 #include <vector>
 #include <thread>
 
-#include "singleton/singleton.h"
-#include "factorymethod/factorymethod.h"
+#include "creational/singleton/singleton.h"
+#include "creational/factorymethod/factorymethod.h"
 
 namespace {
 
-namespace pt = patterns::singleton;
+namespace pc = patterns::creational;
 
-void createSingleton(std::vector<pt::Singleton*>& instances, std::mutex& mtx) {
+void createSingleton(std::vector<pc::Singleton*>& instances, std::mutex& mtx) {
     std::lock_guard<std::mutex> lock(mtx);
-    instances.push_back(pt::Singleton::get());
+    instances.push_back(pc::Singleton::get());
 }
 
 void singletonTest() {
     std::mutex mtx;
-    std::vector<pt::Singleton*> instances = {};
+    std::vector<pc::Singleton*> instances = {};
     std::vector<std::thread> threads;
 
     constexpr int num = 10;
@@ -39,9 +39,9 @@ void singletonTest() {
 }
 
 void factoryMethodTest() {
-    std::vector<std::unique_ptr<pt::Factory>> factories;
-    factories.push_back(std::make_unique<pt::TriangleFactory>());
-    factories.push_back(std::make_unique<pt::RectangleFactory>());
+    std::vector<std::unique_ptr<pc::Factory>> factories;
+    factories.push_back(std::make_unique<pc::TriangleFactory>());
+    factories.push_back(std::make_unique<pc::RectangleFactory>());
     
     std::string res = "";
     for (const auto& f : factories) {

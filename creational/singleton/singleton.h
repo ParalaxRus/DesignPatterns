@@ -4,7 +4,7 @@
 #include <mutex>
 #include <iostream>
 
-namespace patterns::singleton {
+namespace patterns::creational {
 
 class Singleton final {
 private:

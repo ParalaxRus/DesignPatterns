@@ -3,7 +3,7 @@
 #include <string>
 #include <memory>
 
-namespace patterns::singleton {
+namespace patterns::creational {
 
 class Shape {
 protected:
