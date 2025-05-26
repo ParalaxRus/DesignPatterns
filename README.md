@@ -1,6 +1,6 @@
 # DesignPatterns
 
-## Implemented patterns
-
-1. Singleton
-2. FactoryMethod
+## Creational patterns
+    1. Singleton
+    2. FactoryMethod
+    3. Prototype
