@@ -1,8 +1,9 @@
-#include <vector>
 #include <thread>
+#include <vector>
 
-#include "creational/singleton/singleton.h"
 #include "creational/factorymethod/factorymethod.h"
+#include "creational/prototype/prototype.h"
+#include "creational/singleton/singleton.h"
 
 namespace {
 
@@ -53,11 +54,30 @@ void factoryMethodTest() {
     }
 }
 
+void prototypeTest() {
+    pc::PrototypeFactory factory;
+    auto protoB = factory.create(pc::PrototypeType::PrototypeTypeB);
+
+    std::vector<pc::UniquePrototype> prototypes;
+    prototypes.emplace_back(factory.create(pc::PrototypeType::PrototypeTypeB));
+    prototypes.emplace_back(factory.create(pc::PrototypeType::PrototypeTypeA));
+    
+    std::string res;
+    for (const auto& p : prototypes) {
+        res += p->representation() + "/n";
+    }
+    
+    if (res != "Name: PrototypeB Val: 2 ValB: 2/nName: PrototypeA Val: 1 ValA: 1/n") {
+        throw std::runtime_error("prototype failed");
+    }
+}
+
 }
 
 int main() {
     singletonTest();
     factoryMethodTest();
+    prototypeTest();
 
     std::cout << "unit tests pass" << std::endl;
 
