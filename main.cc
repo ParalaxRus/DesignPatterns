@@ -4,10 +4,12 @@
 #include "creational/factorymethod/factorymethod.h"
 #include "creational/prototype/prototype.h"
 #include "creational/singleton/singleton.h"
+#include "structural/proxy/proxy.h"
 
 namespace {
 
 namespace pc = patterns::creational;
+namespace ps = patterns::structural;
 
 void createSingleton(std::vector<pc::Singleton*>& instances, std::mutex& mtx) {
     std::lock_guard<std::mutex> lock(mtx);
@@ -72,12 +74,32 @@ void prototypeTest() {
     }
 }
 
+void proxyTest() {
+    auto clientFunc = [](const ps::Service& service, const std::string& expected) {
+        const auto response = service.request();
+        if (response != expected) {
+            throw std::runtime_error("proxy failed");
+        }
+    };
+
+    auto serviceA = std::make_unique<ps::ServiceA>("serviceA");
+    clientFunc(*serviceA, "serviceA");
+
+    ps::Proxy proxy("proxy", {"proxy"});
+    clientFunc(proxy, "proxy");
+
+    ps::Proxy proxy1("proxy1", {"proxy"});
+    clientFunc(proxy1, {});
+}
+
 }
 
 int main() {
     singletonTest();
     factoryMethodTest();
     prototypeTest();
+
+    proxyTest();
 
     std::cout << "unit tests pass" << std::endl;
 
