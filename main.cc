@@ -1,6 +1,7 @@
 #include <thread>
 #include <vector>
 
+#include "creational/builder/builder.h"
 #include "creational/factorymethod/factorymethod.h"
 #include "creational/prototype/prototype.h"
 #include "creational/singleton/singleton.h"
@@ -74,6 +75,25 @@ void prototypeTest() {
     }
 }
 
+void builderTest() {
+    pc::BbqDinnerBuilder bbqBuilder;
+    pc::DinnerDirector director(&bbqBuilder);
+    director.liteDinner();
+
+    auto liteDinner = bbqBuilder.getDinner();
+    auto liteBbqMeal = liteDinner->menu();
+    if (liteBbqMeal != "bbq ribs") {
+        throw std::runtime_error("builder failed");
+    }
+
+    director.fullDinner();
+    auto fullDinner = bbqBuilder.getDinner();
+    auto fullBbqMeal = fullDinner->menu();
+    if (fullBbqMeal != "shrimp cocktail;bbq ribs;ice cream") {
+        throw std::runtime_error("builder failed");
+    }
+}
+
 void proxyTest() {
     auto clientFunc = [](const ps::Service& service, const std::string& expected) {
         const auto response = service.request();
@@ -98,6 +118,7 @@ int main() {
     singletonTest();
     factoryMethodTest();
     prototypeTest();
+    builderTest();
 
     proxyTest();
 

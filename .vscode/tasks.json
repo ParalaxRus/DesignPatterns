@@ -16,6 +16,7 @@
                 "-Wall",
                 "-g",
                 "main.cc",
+                "creational/builder/builder.cc",
                 "creational/singleton/singleton.cc",
                 "creational/factorymethod/factorymethod.cc",
                 "creational/prototype/prototype.cc",
