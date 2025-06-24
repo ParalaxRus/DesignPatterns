@@ -9,3 +9,4 @@
 
 ## Structural patterns
     1. Proxy
+    2. Adapter

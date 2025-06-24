@@ -20,6 +20,7 @@
                 "creational/singleton/singleton.cc",
                 "creational/factorymethod/factorymethod.cc",
                 "creational/prototype/prototype.cc",
+                "structural/adapter/adapter.cc",
                 "structural/proxy/proxy.cc",
                 "-o",
                 "build/app",

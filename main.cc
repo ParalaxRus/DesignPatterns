@@ -5,6 +5,7 @@
 #include "creational/factorymethod/factorymethod.h"
 #include "creational/prototype/prototype.h"
 #include "creational/singleton/singleton.h"
+#include "structural/adapter/adapter.h"
 #include "structural/proxy/proxy.h"
 
 namespace {
@@ -112,6 +113,32 @@ void proxyTest() {
     clientFunc(proxy1, {});
 }
 
+void adapterTest() {
+    auto add = [](const ps::NewCalculator* calc, double a, double b) -> double {
+        return calc->add(a, b);
+    };
+
+    auto sub = [](const ps::NewCalculator* calc, double a, double b) -> double {
+        return calc->substract(a, b);
+    };
+
+    ps::NewCalculator newCalc;
+    if (add(&newCalc, 3.5, 4.0) != 7.5) {
+        throw std::runtime_error("adapter failed");
+    }
+    if (sub(&newCalc, 3.5, 4.0) != -0.5) {
+        throw std::runtime_error("adapter failed");
+    }
+
+    ps::Adapter adapter(std::make_unique<ps::OldCalculator>());
+    if (add(&adapter, 3.5, 4.0) != 7.0) {
+        throw std::runtime_error("adapter failed");
+    }
+    if (sub(&adapter, 3.5, 4.0) != -1.0) {
+        throw std::runtime_error("adapter failed");
+    }
+}
+
 }
 
 int main() {
@@ -120,6 +147,7 @@ int main() {
     prototypeTest();
     builderTest();
 
+    adapterTest();
     proxyTest();
 
     std::cout << "unit tests pass" << std::endl;
