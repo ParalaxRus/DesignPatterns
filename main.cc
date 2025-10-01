@@ -5,12 +5,14 @@
 #include "creational/factorymethod/factorymethod.h"
 #include "creational/prototype/prototype.h"
 #include "creational/singleton/singleton.h"
+#include "pointers/unique/custom_unique_ptr.h"
 #include "structural/adapter/adapter.h"
 #include "structural/proxy/proxy.h"
 
 namespace {
 
 namespace pc = patterns::creational;
+namespace pp = patterns::pointers;
 namespace ps = patterns::structural;
 
 void createSingleton(std::vector<pc::Singleton*>& instances, std::mutex& mtx) {
@@ -113,6 +115,51 @@ void proxyTest() {
     clientFunc(proxy1, {});
 }
 
+void pointersTest() {
+    {
+        pp::CustomUniquePtr<int> uniquePtr(new int(5));
+        if ((uniquePtr.get() == nullptr) || (*uniquePtr.get() != 5)) {
+            throw std::runtime_error("unique pointer failed");    
+        }
+
+        pp::CustomUniquePtr<int> uniquePtr1(std::move(uniquePtr));
+        if (uniquePtr) {
+            throw std::runtime_error("unique pointer failed");    
+        }
+
+        if ( !uniquePtr1 || (*uniquePtr1.get() != 5)) {
+            throw std::runtime_error("unique pointer failed");    
+        }
+
+        auto uniquePtr2 = std::move(uniquePtr1);
+        if (uniquePtr1) {
+            throw std::runtime_error("unique pointer failed");    
+        }
+
+        if ( !uniquePtr2 || (*uniquePtr2.get() != 5)) {
+            throw std::runtime_error("unique pointer failed");    
+        }
+
+        if (*uniquePtr2 != 5) {
+            throw std::runtime_error("unique pointer failed");
+        }
+
+        std::vector<pp::CustomUniquePtr<double>> uniquePtrs;
+        uniquePtrs.push_back(pp::CustomUniquePtr<double>(new double(1.1)));
+        uniquePtrs.push_back(pp::CustomUniquePtr<double>(new double(2.2)));
+        uniquePtrs.push_back(pp::CustomUniquePtr<double>(new double(3.3)));
+
+        const std::vector<double> expected = {1.1, 2.2, 3.3};
+        int i = 0;
+        for (const auto& ptr : uniquePtrs) {
+            if (*ptr != expected[i++]) {
+                throw std::runtime_error("unique pointer failed");
+            }
+        }
+    }
+    
+}
+
 void adapterTest() {
     auto add = [](const ps::NewCalculator* calc, double a, double b) -> double {
         return calc->add(a, b);
@@ -146,6 +193,8 @@ int main() {
     factoryMethodTest();
     prototypeTest();
     builderTest();
+
+    pointersTest();
 
     adapterTest();
     proxyTest();
