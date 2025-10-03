@@ -5,6 +5,7 @@
 #include "creational/factorymethod/factorymethod.h"
 #include "creational/prototype/prototype.h"
 #include "creational/singleton/singleton.h"
+#include "pointers/shared/custom_shared_ptr.h"
 #include "pointers/unique/custom_unique_ptr.h"
 #include "structural/adapter/adapter.h"
 #include "structural/proxy/proxy.h"
@@ -115,49 +116,171 @@ void proxyTest() {
     clientFunc(proxy1, {});
 }
 
-void pointersTest() {
-    {
-        pp::CustomUniquePtr<int> uniquePtr(new int(5));
-        if ((uniquePtr.get() == nullptr) || (*uniquePtr.get() != 5)) {
-            throw std::runtime_error("unique pointer failed");    
-        }
+void uniquePtrTest() {
+    // Ctor
+    pp::CustomUniquePtr<int> uniquePtr(new int(5));
+    if ((uniquePtr.get() == nullptr) || (*uniquePtr.get() != 5)) {
+        throw std::runtime_error("unique pointer failed");    
+    }
 
-        pp::CustomUniquePtr<int> uniquePtr1(std::move(uniquePtr));
-        if (uniquePtr) {
-            throw std::runtime_error("unique pointer failed");    
-        }
+    // Move ctor
+    pp::CustomUniquePtr<int> uniquePtr1(std::move(uniquePtr));
+    if (uniquePtr) {
+        throw std::runtime_error("unique pointer failed");    
+    }
+    if ( !uniquePtr1 || (*uniquePtr1.get() != 5)) {
+        throw std::runtime_error("unique pointer failed");    
+    }
 
-        if ( !uniquePtr1 || (*uniquePtr1.get() != 5)) {
-            throw std::runtime_error("unique pointer failed");    
-        }
+    // Move copy assignment
+    auto uniquePtr2 = std::move(uniquePtr1);
+    if (uniquePtr1) {
+        throw std::runtime_error("unique pointer failed");    
+    }
+    if ( !uniquePtr2 || (*uniquePtr2.get() != 5)) {
+        throw std::runtime_error("unique pointer failed");    
+    }
+    if (*uniquePtr2 != 5) {
+        throw std::runtime_error("unique pointer failed");
+    }
 
-        auto uniquePtr2 = std::move(uniquePtr1);
-        if (uniquePtr1) {
-            throw std::runtime_error("unique pointer failed");    
-        }
+    // Container test
+    std::vector<pp::CustomUniquePtr<double>> uniquePtrs;
+    uniquePtrs.push_back(pp::CustomUniquePtr<double>(new double(1.1)));
+    uniquePtrs.push_back(pp::CustomUniquePtr<double>(new double(2.2)));
+    uniquePtrs.push_back(pp::CustomUniquePtr<double>(new double(3.3)));
 
-        if ( !uniquePtr2 || (*uniquePtr2.get() != 5)) {
-            throw std::runtime_error("unique pointer failed");    
-        }
-
-        if (*uniquePtr2 != 5) {
+    const std::vector<double> expected = {1.1, 2.2, 3.3};
+    int i = 0;
+    for (const auto& ptr : uniquePtrs) {
+        if (*ptr != expected[i++]) {
             throw std::runtime_error("unique pointer failed");
         }
+    }
+}
 
-        std::vector<pp::CustomUniquePtr<double>> uniquePtrs;
-        uniquePtrs.push_back(pp::CustomUniquePtr<double>(new double(1.1)));
-        uniquePtrs.push_back(pp::CustomUniquePtr<double>(new double(2.2)));
-        uniquePtrs.push_back(pp::CustomUniquePtr<double>(new double(3.3)));
+void sharedPtrTest() {
+    // Ctor
+    pp::CustomSharedPtr<int> sharedPtr(new int(5));
+    if (!sharedPtr || (*sharedPtr != 5) ) {
+        throw std::runtime_error("shared pointer failed");
+    }
 
-        const std::vector<double> expected = {1.1, 2.2, 3.3};
-        int i = 0;
-        for (const auto& ptr : uniquePtrs) {
-            if (*ptr != expected[i++]) {
-                throw std::runtime_error("unique pointer failed");
-            }
+    // Copy ctor
+    pp::CustomSharedPtr<int> sharedPtr1(sharedPtr);
+    if ( !sharedPtr || (*sharedPtr != 5) || !sharedPtr1 || (*sharedPtr1 != 5) ) {
+        throw std::runtime_error("shared pointer failed");
+    }
+
+    sharedPtr.release();
+    if (sharedPtr) {
+        throw std::runtime_error("shared pointer failed");
+    }
+    if (!sharedPtr1 || (*sharedPtr1 != 5) ) {
+        throw std::runtime_error("shared pointer failed");
+    }
+    sharedPtr1.release();
+    if (sharedPtr1) {
+        throw std::runtime_error("shared pointer failed");
+    }
+
+    // Copy assignment
+    pp::CustomSharedPtr<int> sharedPtr2(new int(10));
+    auto sharedPtr3 = sharedPtr2;
+    if ( !sharedPtr2 || (*sharedPtr2 != 10) || !sharedPtr3 || (*sharedPtr3 != 10) ) {
+        throw std::runtime_error("shared pointer failed");
+    }
+
+    sharedPtr2.release();
+    if (sharedPtr2) {
+        throw std::runtime_error("shared pointer failed");
+    }
+    if (!sharedPtr3 || (*sharedPtr3 != 10) ) {
+        throw std::runtime_error("shared pointer failed");
+    }
+    sharedPtr3.release();
+    if (sharedPtr3) {
+        throw std::runtime_error("shared pointer failed");
+    }
+
+    // Move ctor
+    pp::CustomSharedPtr<int> sharedPtr4(new int(2));
+    pp::CustomSharedPtr<int> sharedPtr5(std::move(sharedPtr4));
+    if (sharedPtr4) {
+        throw std::runtime_error("shared pointer failed");
+    }
+    if (!sharedPtr5 || (*sharedPtr5 != 2) ) {
+        throw std::runtime_error("shared pointer failed");
+    }
+    sharedPtr5.release();
+    if (sharedPtr5) {
+        throw std::runtime_error("shared pointer failed");
+    }
+
+    // Move assignment
+    pp::CustomSharedPtr<int> sharedPtr6(new int(3));
+    auto sharedPtr7 = std::move(sharedPtr6);
+    if (sharedPtr6) {
+        throw std::runtime_error("shared pointer failed");
+    }
+    if (!sharedPtr7 || (*sharedPtr7 != 3) ) {
+        throw std::runtime_error("shared pointer failed");
+    }
+    sharedPtr7.release();
+    if (sharedPtr7) {
+        throw std::runtime_error("shared pointer failed");
+    }
+
+    // Container test 1
+    std::vector<pp::CustomSharedPtr<double>> sharedPtrs;
+    sharedPtrs.push_back(pp::CustomSharedPtr<double>(new double(1.1)));
+    sharedPtrs.push_back(pp::CustomSharedPtr<double>(new double(2.2)));
+    sharedPtrs.push_back(pp::CustomSharedPtr<double>(new double(3.3)));
+
+    const std::vector<double> expected = {1.1, 2.2, 3.3};
+    int i = 0;
+    for (const auto& ptr : sharedPtrs) {
+        if (*ptr != expected[i++]) {
+            throw std::runtime_error("shared pointer failed");
         }
     }
-    
+
+    // Container test 2
+    pp::CustomSharedPtr<double> sharedPtr8(new double(11.5));
+    std::vector<pp::CustomSharedPtr<double>> sharedPtrs2;
+    sharedPtrs2.push_back(sharedPtr8);
+    sharedPtrs2.push_back(sharedPtr8);
+    sharedPtrs2.push_back(sharedPtr8);
+
+    const std::vector<double> expected2 = {11.5, 11.5, 11.5};
+    i = 0;
+    for (const auto& ptr : sharedPtrs2) {
+        if (*ptr != expected2[i++]) {
+            throw std::runtime_error("shared pointer failed");
+        }
+    }
+
+    for (auto& ptr : sharedPtrs2) {
+        ptr.release();
+    }
+    for (auto& ptr : sharedPtrs2) {
+        if (ptr) {
+            throw std::runtime_error("shared pointer failed");
+        }
+    }
+    if (!sharedPtr8) {
+        throw std::runtime_error("shared pointer failed");
+    }
+    sharedPtr8.release();
+    if (sharedPtr8) {
+        throw std::runtime_error("shared pointer failed");
+    }
+}
+
+void pointersTest() {
+    uniquePtrTest();
+
+    sharedPtrTest();
 }
 
 void adapterTest() {
